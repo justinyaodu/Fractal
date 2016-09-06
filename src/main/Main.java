@@ -55,9 +55,9 @@ public class Main
 
 		mainWindow.setLocationRelativeTo(null);
 
-		//mainWindow.setExtendedState(JFrame.MAXIMIZED_BOTH);
-		//mainWindow.setResizable(false);
-		//mainWindow.setUndecorated(true);
+		// mainWindow.setExtendedState(JFrame.MAXIMIZED_BOTH);
+		// mainWindow.setResizable(false);
+		// mainWindow.setUndecorated(true);
 
 		mainWindow.addMouseListener(new MouseClickInput());
 
@@ -79,7 +79,7 @@ public class Main
 		}
 
 		else if (!renderComplete && renderContinue(endTime))
-		{			
+		{
 			renderImageToFrame();
 			renderComplete = true;
 			System.out.println("Image rendered");
