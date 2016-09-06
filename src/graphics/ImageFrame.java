@@ -6,8 +6,6 @@ import java.awt.Image;
 
 import javax.swing.*;
 
-import main.Main;
-
 public class ImageFrame extends JFrame
 {
 	private static final long serialVersionUID = 1L;
@@ -62,7 +60,7 @@ class ImagePanel extends JPanel
 		super.paintComponent(graphics);
 
 		if (image != null)
-			//TODO change to below line once window size problem figured out :)
+			// TODO change to below line once window size problem figured out :)
 			// graphics.drawImage(image, 0, 0, getWidth(), getHeight(), this);
 			graphics.drawImage(image, 0, 0, this);
 	}
