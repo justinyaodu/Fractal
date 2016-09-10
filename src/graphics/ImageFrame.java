@@ -1,67 +1,59 @@
 package graphics;
 
-import java.awt.BorderLayout;
-import java.awt.Graphics;
+import java.awt.FlowLayout;
 import java.awt.Image;
 
 import javax.swing.*;
+
+import input.KeyboardInput;
+import input.MouseClickInput;
 
 public class ImageFrame extends JFrame
 {
 	private static final long serialVersionUID = 1L;
 
-	ImagePanel imagePanel;
+	JPanel imagePanel;
+	JLabel imageLabel;
 
 	public ImageFrame(String name, Image image)
 	{
 		setName(name);
 
-		setLayout(new BorderLayout());
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setLocationRelativeTo(null);
+		setExtendedState(JFrame.MAXIMIZED_BOTH);
+		setResizable(false);
+		setUndecorated(true);
+		setLayout(new FlowLayout(FlowLayout.LEADING, -5, -5));
+
+		addMouseListener(new MouseClickInput());
+		addKeyListener(new KeyboardInput());
+
+		setVisible(true);
 
 		updateImage(image);
 	}
 
 	public void updateImage(Image image)
 	{
-		if (imagePanel != null)
-			remove(imagePanel);
+		if (imageLabel != null && imageLabel.getParent() != null)
+			imageLabel.getParent().remove(imageLabel);
+
+		if (imagePanel != null && imagePanel.getParent() != null)
+			imagePanel.getParent().remove(imagePanel);
 
 		if (image != null)
 		{
-			imagePanel = new ImagePanel(image);
-			add(imagePanel, BorderLayout.CENTER);
+			imagePanel = new JPanel();
+			// imagePanel.setBorder(BorderFactory.createEmptyBorder());
+
+			imageLabel = new JLabel(new ImageIcon(image, "fractal"));
+			// imageLabel.setBorder(BorderFactory.createEmptyBorder());
+
+			imagePanel.add(imageLabel);
+			add(imagePanel);
+
+			pack();
 		}
-
-		pack();
-
-		repaint();
-	}
-
-	public void repaint()
-	{
-		if (imagePanel != null)
-			imagePanel.repaint();
-	}
-}
-
-class ImagePanel extends JPanel
-{
-	private static final long serialVersionUID = 1L;
-
-	Image image;
-
-	public ImagePanel(Image image)
-	{
-		this.image = image;
-	}
-
-	protected void paintComponent(Graphics graphics)
-	{
-		super.paintComponent(graphics);
-
-		if (image != null)
-			// TODO change to below line once window size problem figured out :)
-			// graphics.drawImage(image, 0, 0, getWidth(), getHeight(), this);
-			graphics.drawImage(image, 0, 0, this);
 	}
 }

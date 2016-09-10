@@ -2,23 +2,20 @@ package main;
 
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 
 import javax.imageio.ImageIO;
-import javax.swing.JFrame;
 import datatype.ComplexNumber;
 import fractal.Mandelbrot;
 import graphics.ImageFrame;
-import input.MouseClickInput;
 
 public class Main
 {
 	static boolean running = true;
-	static boolean previewComplete = false;
-	static boolean renderComplete = false;
 
 	static int previewQuality = 16;
 
@@ -39,53 +36,14 @@ public class Main
 
 	public static void main(String[] args)
 	{
-		initJFrame();
-
-		while (running)
-		{
-			update();
-		}
+		init();
 	}
 
-	static void initJFrame()
+	static void init()
 	{
-		mainWindow = new ImageFrame("Fractal", null);
+		renderImage();
 
-		mainWindow.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
-		mainWindow.setLocationRelativeTo(null);
-
-		// mainWindow.setExtendedState(JFrame.MAXIMIZED_BOTH);
-		// mainWindow.setResizable(false);
-		// mainWindow.setUndecorated(true);
-
-		mainWindow.addMouseListener(new MouseClickInput());
-
-		mainWindow.setVisible(true);
-
-		renderImageToFrame();
-	}
-
-	static void update()
-	{
-		long endTime = System.currentTimeMillis() + millisRenderTime;
-
-		if (!previewComplete)
-		{
-			renderPreview();
-			previewComplete = true;
-			renderImageToFrame();
-			System.out.println("Preview rendered");
-		}
-
-		else if (!renderComplete && renderContinue(endTime))
-		{
-			renderImageToFrame();
-			renderComplete = true;
-			System.out.println("Image rendered");
-		}
-
-		// System.out.println("Update");
+		mainWindow = new ImageFrame("Fractal", bufferedImage);
 	}
 
 	static void renderImageToFile(String name)
@@ -102,8 +60,49 @@ public class Main
 		System.out.println("File rendered");
 	}
 
+	public static void onKeyDown(KeyEvent keyEvent)
+	{
+		switch (keyEvent.getKeyCode())
+		{
+			case KeyEvent.VK_W:
+				centre.imaginary -= halfSize / 2;
+				update();
+				break;
+			case KeyEvent.VK_A:
+				centre.real -= halfSize / 2;
+				update();
+				break;
+			case KeyEvent.VK_S:
+				centre.imaginary += halfSize / 2;
+				update();
+				break;
+			case KeyEvent.VK_D:
+				centre.real += halfSize / 2;
+				update();
+				break;
+			case KeyEvent.VK_UP:
+				halfSize /= 2;
+				update();
+				break;
+			case KeyEvent.VK_DOWN:
+				halfSize *= 2;
+				update();
+				break;
+			case KeyEvent.VK_RIGHT:
+				iterations *= 2;
+				update();
+				break;
+			case KeyEvent.VK_LEFT:
+				iterations /= 2;
+				update();
+				break;
+		}
+	}
+
 	public static void onMouseClick(MouseEvent mouseEvent)
 	{
+		Mandelbrot.terminateTrigger = true;
+
 		double x = ((double) mouseEvent.getX() / (length - 1) * 2 - 1);
 		x *= (double) length / height * halfSize;
 		double y = ((double) mouseEvent.getY() / (height - 1) * 2 - 1);
@@ -111,37 +110,29 @@ public class Main
 
 		ComplexNumber offset = new ComplexNumber(x, y);
 		centre = ComplexNumber.add(centre, offset);
-		resetRender();
 
-		System.out.println(centre.toString());
+		update();
 	}
 
-	static boolean renderContinue(long endTime)
+	static void update()
 	{
-		bufferedImage = Mandelbrot.getAreaTimed(centre, halfSize, length, height, iterations, endTime);
-		return bufferedImage != null;
+		renderImage();
+
+		renderImageToFrame();
+	}
+
+	static void renderImage()
+	{
+		bufferedImage = null;
+
+		while (bufferedImage == null)
+		{
+			bufferedImage = Mandelbrot.getArea(centre, halfSize, length, height, iterations);
+		}
 	}
 
 	static void renderImageToFrame()
 	{
 		mainWindow.updateImage(bufferedImage);
-		mainWindow.pack();
-	}
-
-	static void renderPreview()
-	{
-		bufferedImage = Mandelbrot.getAreaTimed(centre, halfSize, length / previewQuality, height / previewQuality,
-				iterations, Long.MAX_VALUE);
-		Mandelbrot.resetRender();
-	}
-
-	static void resetRender()
-	{
-		Mandelbrot.resetRender();
-		previewComplete = false;
-		renderComplete = false;
-		bufferedImage = null;
-		System.out.println("Render restarted");
-		update();
 	}
 }

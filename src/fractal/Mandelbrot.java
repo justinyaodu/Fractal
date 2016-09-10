@@ -8,9 +8,7 @@ import datatype.ComplexNumber;
 
 public class Mandelbrot
 {
-	static int[][] points;
-	static BufferedImage bufferedImage;
-	static int[] colours;
+	public static boolean terminateTrigger = false;
 
 	// **Julia*//
 	public static int getPoint(ComplexNumber z, ComplexNumber c, int iterations)
@@ -41,42 +39,39 @@ public class Mandelbrot
 		return iterations + 1;
 	}
 
-	public static BufferedImage getAreaTimed(ComplexNumber centre, double halfSize, int length, int height,
-			int iterations, long stopTime)
+	public static BufferedImage getArea(ComplexNumber centre, double halfSize, int length, int height, int iterations)
 	{
 		ComplexNumber min = new ComplexNumber(centre.real - halfSize * length / height, centre.imaginary - halfSize);
 		ComplexNumber max = new ComplexNumber(centre.real + halfSize * length / height, centre.imaginary + halfSize);
 
-		if (points == null)
+		int[][] points = new int[length][height];
+		for (int i = 0; i < length; i++)
 		{
-			points = new int[length][height];
-			for (int i = 0; i < length; i++)
-			{
-				Arrays.fill(points[i], -1);
-			}
+			Arrays.fill(points[i], -1);
 		}
 
-		if (bufferedImage == null)
-		{
-			bufferedImage = new BufferedImage(length, height, BufferedImage.TYPE_4BYTE_ABGR);
-		}
+		BufferedImage bufferedImage = new BufferedImage(length, height, BufferedImage.TYPE_3BYTE_BGR);
 
-		if (colours == null)
-		{
-			colours = new int[iterations + 2];
+		int[] colours = new int[iterations + 2];
 
-			for (int i = 0; i < iterations + 2; i++)
-			{
-				float value = (float) i / (iterations + 1);
-				colours[i] = new Color(Math.max((2 * value - 1), 0), Math.min((2 * value), 1),
-						Math.max((2 * value - 1), 0)).getRGB();
-			}
+		for (int i = 0; i < iterations + 2; i++)
+		{
+			float value = (float) i / (iterations + 1);
+			colours[i] = new Color(Math.max((2 * value - 1), 0), Math.min((2 * value), 1), Math.max((2 * value - 1), 0))
+					.getRGB();
 		}
 
 		for (int x = 0; x < length; x++)
 		{
 			for (int y = 0; y < height; y++)
 			{
+				if (terminateTrigger)
+				{
+					System.out.println("Render aborted");
+					terminateTrigger = false;
+					return null;
+				}
+
 				if (points[x][y] >= 0)
 					continue;
 
@@ -85,9 +80,6 @@ public class Mandelbrot
 				int value = getPoint(point, iterations);
 				points[x][y] = value;
 				bufferedImage.setRGB(x, y, colours[value]);
-
-				if (System.currentTimeMillis() >= stopTime)
-					return null;
 			}
 		}
 
@@ -120,12 +112,5 @@ public class Mandelbrot
 		}
 
 		return bufferedImage;
-	}
-
-	public static void resetRender()
-	{
-		points = null;
-		colours = null;
-		bufferedImage = null;
 	}
 }
