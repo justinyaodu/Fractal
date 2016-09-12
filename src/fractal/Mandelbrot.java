@@ -2,12 +2,18 @@ package fractal;
 
 import java.awt.Color;
 import java.awt.image.BufferedImage;
-import java.util.Arrays;
 
 import datatype.ComplexNumber;
+import datatype.FractalConfiguration;
 
 public class Mandelbrot
 {
+	// TODO accelerate image rendering using previously rendered image
+	public enum Direction
+	{
+		Up, Down, Left, Right
+	};
+
 	public static boolean terminateTrigger = false;
 
 	// **Julia*//
@@ -36,27 +42,24 @@ public class Mandelbrot
 			if (z.squaredAbsoluteValue() > 4)
 				return passes;
 		}
+
 		return iterations + 1;
 	}
 
-	public static BufferedImage getArea(ComplexNumber centre, double halfSize, int length, int height, int iterations)
+	public static BufferedImage getArea(FractalConfiguration configuration, int length, int height)
 	{
-		ComplexNumber min = new ComplexNumber(centre.real - halfSize * length / height, centre.imaginary - halfSize);
-		ComplexNumber max = new ComplexNumber(centre.real + halfSize * length / height, centre.imaginary + halfSize);
-
-		int[][] points = new int[length][height];
-		for (int i = 0; i < length; i++)
-		{
-			Arrays.fill(points[i], -1);
-		}
+		ComplexNumber min = new ComplexNumber(configuration.centre.real - configuration.halfSize * length / height,
+				configuration.centre.imaginary - configuration.halfSize);
+		ComplexNumber max = new ComplexNumber(configuration.centre.real + configuration.halfSize * length / height,
+				configuration.centre.imaginary + configuration.halfSize);
 
 		BufferedImage bufferedImage = new BufferedImage(length, height, BufferedImage.TYPE_3BYTE_BGR);
 
-		int[] colours = new int[iterations + 2];
+		int[] colours = new int[configuration.iterations + 2];
 
-		for (int i = 0; i < iterations + 2; i++)
+		for (int i = 0; i < configuration.iterations + 2; i++)
 		{
-			float value = (float) i / (iterations + 1);
+			float value = (float) i / (configuration.iterations + 1);
 			colours[i] = new Color(Math.max((2 * value - 1), 0), Math.min((2 * value), 1), Math.max((2 * value - 1), 0))
 					.getRGB();
 		}
@@ -67,47 +70,17 @@ public class Mandelbrot
 			{
 				if (terminateTrigger)
 				{
-					System.out.println("Render aborted");
 					terminateTrigger = false;
 					return null;
 				}
 
-				if (points[x][y] >= 0)
+				if (bufferedImage.getRGB(x, y) != -16777216)
 					continue;
 
 				ComplexNumber point = new ComplexNumber(min.real + (max.real - min.real) * x / (length - 1),
 						min.imaginary + (max.imaginary - min.imaginary) * y / (height - 1));
-				int value = getPoint(point, iterations);
-				points[x][y] = value;
+				int value = getPoint(point, configuration.iterations);
 				bufferedImage.setRGB(x, y, colours[value]);
-			}
-		}
-
-		return bufferedImage;
-	}
-
-	@Deprecated
-	public static BufferedImage arrayToImage(int[][] points, int iterations)
-	{
-		int length = points.length;
-		int height = points[0].length;
-
-		int[] colours = new int[iterations + 2];
-
-		for (int i = 0; i < iterations + 2; i++)
-		{
-			float value = (float) i / (iterations + 1);
-			colours[i] = new Color(Math.max((2 * value - 1), 0), Math.min((2 * value), 1), Math.max((2 * value - 1), 0))
-					.getRGB();
-		}
-
-		BufferedImage bufferedImage = new BufferedImage(length, height, BufferedImage.TYPE_4BYTE_ABGR);
-
-		for (int y = 0; y < height; y++)
-		{
-			for (int x = 0; x < length; x++)
-			{
-				bufferedImage.setRGB(x, y, colours[points[x][y]]);
 			}
 		}
 

@@ -36,4 +36,10 @@ public class ComplexNumber
 	{
 		return (real + " + " + imaginary + "i");
 	}
+
+	public static ComplexNumber clamp(ComplexNumber value, ComplexNumber min, ComplexNumber max)
+	{
+		return new ComplexNumber(Math.max(min.real, Math.min(value.real, max.real)),
+				Math.max(min.imaginary, Math.min(value.imaginary, max.imaginary)));
+	}
 }

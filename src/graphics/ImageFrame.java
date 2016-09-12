@@ -10,6 +10,8 @@ import input.MouseClickInput;
 
 public class ImageFrame extends JFrame
 {
+	// TODO don't use imageicon anymore so we can render scaled images
+
 	private static final long serialVersionUID = 1L;
 
 	JPanel imagePanel;
@@ -45,10 +47,8 @@ public class ImageFrame extends JFrame
 		if (image != null)
 		{
 			imagePanel = new JPanel();
-			// imagePanel.setBorder(BorderFactory.createEmptyBorder());
 
 			imageLabel = new JLabel(new ImageIcon(image, "fractal"));
-			// imageLabel.setBorder(BorderFactory.createEmptyBorder());
 
 			imagePanel.add(imageLabel);
 			add(imagePanel);

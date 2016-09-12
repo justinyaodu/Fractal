@@ -10,6 +10,7 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 import datatype.ComplexNumber;
+import datatype.FractalConfiguration;
 import fractal.Mandelbrot;
 import graphics.ImageFrame;
 
@@ -23,9 +24,7 @@ public class Main
 	public static int length = graphicsDevice.getDisplayMode().getWidth();
 	public static int height = graphicsDevice.getDisplayMode().getHeight();
 
-	static ComplexNumber centre = new ComplexNumber(0, 0);
-	static int iterations = 64;
-	static double halfSize = 2;
+	static FractalConfiguration configuration = new FractalConfiguration(new ComplexNumber(0, 0), 2, 64);
 
 	static int millisRenderTime = 50;
 	static long startTime = System.currentTimeMillis();
@@ -65,35 +64,39 @@ public class Main
 		switch (keyEvent.getKeyCode())
 		{
 			case KeyEvent.VK_W:
-				centre.imaginary -= halfSize / 2;
+				configuration.setCentre(new ComplexNumber(configuration.centre.real,
+						configuration.centre.imaginary - (configuration.halfSize / 2)));
 				update();
 				break;
 			case KeyEvent.VK_A:
-				centre.real -= halfSize / 2;
+				configuration.setCentre(new ComplexNumber(configuration.centre.real - (configuration.halfSize / 2),
+						configuration.centre.imaginary));
 				update();
 				break;
 			case KeyEvent.VK_S:
-				centre.imaginary += halfSize / 2;
+				configuration.setCentre(new ComplexNumber(configuration.centre.real,
+						configuration.centre.imaginary + (configuration.halfSize / 2)));
 				update();
 				break;
 			case KeyEvent.VK_D:
-				centre.real += halfSize / 2;
+				configuration.setCentre(new ComplexNumber(configuration.centre.real + (configuration.halfSize / 2),
+						configuration.centre.imaginary));
 				update();
 				break;
 			case KeyEvent.VK_UP:
-				halfSize /= 2;
+				configuration.multiplyHalfSize(0.5);
 				update();
 				break;
 			case KeyEvent.VK_DOWN:
-				halfSize *= 2;
+				configuration.multiplyHalfSize(2);
 				update();
 				break;
 			case KeyEvent.VK_RIGHT:
-				iterations *= 2;
+				configuration.multiplyIterations(2);
 				update();
 				break;
 			case KeyEvent.VK_LEFT:
-				iterations /= 2;
+				configuration.multiplyIterations(0.5);
 				update();
 				break;
 		}
@@ -101,21 +104,21 @@ public class Main
 
 	public static void onMouseClick(MouseEvent mouseEvent)
 	{
-		Mandelbrot.terminateTrigger = true;
-
 		double x = ((double) mouseEvent.getX() / (length - 1) * 2 - 1);
-		x *= (double) length / height * halfSize;
+		x *= (double) length / height * configuration.halfSize;
 		double y = ((double) mouseEvent.getY() / (height - 1) * 2 - 1);
-		y *= halfSize;
+		y *= configuration.halfSize;
 
 		ComplexNumber offset = new ComplexNumber(x, y);
-		centre = ComplexNumber.add(centre, offset);
+		configuration.setCentre(ComplexNumber.add(configuration.centre, offset));
 
 		update();
 	}
 
 	static void update()
 	{
+		Mandelbrot.terminateTrigger = true;
+
 		renderImage();
 
 		renderImageToFrame();
@@ -127,7 +130,7 @@ public class Main
 
 		while (bufferedImage == null)
 		{
-			bufferedImage = Mandelbrot.getArea(centre, halfSize, length, height, iterations);
+			bufferedImage = Mandelbrot.getArea(configuration, length, height);
 		}
 	}
 
