@@ -61,42 +61,72 @@ public class Main
 
 	public static void onKeyDown(KeyEvent keyEvent)
 	{
+		boolean shiftDown = keyEvent.isShiftDown();
+
 		switch (keyEvent.getKeyCode())
 		{
 			case KeyEvent.VK_W:
-				configuration.setCentre(new ComplexNumber(configuration.centre.real,
-						configuration.centre.imaginary - (configuration.halfSize / 2)));
+				if (shiftDown)
+					configuration.setCentre(new ComplexNumber(configuration.centre.real,
+							configuration.centre.imaginary - (configuration.halfSize / 4)));
+				else
+					configuration.setCentre(new ComplexNumber(configuration.centre.real,
+							configuration.centre.imaginary - (configuration.halfSize / 2)));
 				update();
 				break;
 			case KeyEvent.VK_A:
-				configuration.setCentre(new ComplexNumber(configuration.centre.real - (configuration.halfSize / 2),
-						configuration.centre.imaginary));
+				if (shiftDown)
+					configuration.setCentre(new ComplexNumber(configuration.centre.real - (configuration.halfSize / 4),
+							configuration.centre.imaginary));
+				else
+					configuration.setCentre(new ComplexNumber(configuration.centre.real - (configuration.halfSize / 2),
+							configuration.centre.imaginary));
 				update();
 				break;
 			case KeyEvent.VK_S:
-				configuration.setCentre(new ComplexNumber(configuration.centre.real,
-						configuration.centre.imaginary + (configuration.halfSize / 2)));
+				if (shiftDown)
+					configuration.setCentre(new ComplexNumber(configuration.centre.real,
+							configuration.centre.imaginary + (configuration.halfSize / 4)));
+				else
+					configuration.setCentre(new ComplexNumber(configuration.centre.real,
+							configuration.centre.imaginary + (configuration.halfSize / 2)));
 				update();
 				break;
 			case KeyEvent.VK_D:
-				configuration.setCentre(new ComplexNumber(configuration.centre.real + (configuration.halfSize / 2),
-						configuration.centre.imaginary));
+				if (shiftDown)
+					configuration.setCentre(new ComplexNumber(configuration.centre.real + (configuration.halfSize / 4),
+							configuration.centre.imaginary));
+				else
+					configuration.setCentre(new ComplexNumber(configuration.centre.real + (configuration.halfSize / 2),
+							configuration.centre.imaginary));
 				update();
 				break;
 			case KeyEvent.VK_UP:
-				configuration.multiplyHalfSize(0.5);
+				if (shiftDown)
+					configuration.multiplyHalfSize(2.0 / 3);
+				else
+					configuration.multiplyHalfSize(0.5);
 				update();
 				break;
 			case KeyEvent.VK_DOWN:
-				configuration.multiplyHalfSize(2);
+				if (shiftDown)
+					configuration.multiplyHalfSize(1.5);
+				else
+					configuration.multiplyHalfSize(2);
 				update();
 				break;
 			case KeyEvent.VK_RIGHT:
-				configuration.multiplyIterations(2);
+				if (shiftDown)
+					configuration.multiplyIterations(1.5);
+				else
+					configuration.multiplyIterations(2);
 				update();
 				break;
 			case KeyEvent.VK_LEFT:
-				configuration.multiplyIterations(0.5);
+				if (shiftDown)
+					configuration.multiplyIterations(2.0 / 3);
+				else
+					configuration.multiplyIterations(0.5);
 				update();
 				break;
 		}
