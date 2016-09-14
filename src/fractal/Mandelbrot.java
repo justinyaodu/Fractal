@@ -32,8 +32,16 @@ public class Mandelbrot
 	// **Mandelbrot*//
 	public static int getPoint(ComplexNumber c, int iterations)
 	{
+		// return iterations + 2 for debug to highlight an area
+
+		if ((c.real + 1) * (c.real + 1) + c.imaginary * c.imaginary < 0.0625)
+			return iterations + 1;
+
+		double q = (c.real - 0.25) * (c.real - 0.25) + c.imaginary * c.imaginary;
+		if (q * (q + (c.real - 0.25)) < 0.25 * c.imaginary * c.imaginary)
+			return iterations + 1;
+
 		ComplexNumber z = ComplexNumber.zero;
-		// ComplexNumber z = c;
 
 		for (int passes = 0; passes <= iterations; passes++)
 		{
@@ -54,8 +62,7 @@ public class Mandelbrot
 				configuration.centre.imaginary + configuration.halfSize);
 
 		BufferedImage bufferedImage = new BufferedImage(length, height, BufferedImage.TYPE_3BYTE_BGR);
-
-		int[] colours = new int[configuration.iterations + 2];
+		int[] colours = new int[configuration.iterations + 3];
 
 		for (int i = 0; i < configuration.iterations + 2; i++)
 		{
@@ -63,6 +70,9 @@ public class Mandelbrot
 			colours[i] = new Color(Math.max((2 * value - 1), 0), Math.min((2 * value), 1), Math.max((2 * value - 1), 0))
 					.getRGB();
 		}
+
+		// this colour is for debugging only
+		colours[configuration.iterations + 2] = new Color(255, 0, 0).getRGB();
 
 		for (int x = 0; x < length; x++)
 		{

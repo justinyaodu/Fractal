@@ -9,6 +9,9 @@ import java.io.File;
 import java.io.IOException;
 
 import javax.imageio.ImageIO;
+
+import org.omg.PortableInterceptor.ClientRequestInfo;
+
 import datatype.ComplexNumber;
 import datatype.FractalConfiguration;
 import fractal.Mandelbrot;
@@ -147,6 +150,9 @@ public class Main
 
 	static void update()
 	{
+		// TODO hack
+		System.out.println(configuration.centre.toString());
+
 		Mandelbrot.terminateTrigger = true;
 
 		renderImage();
